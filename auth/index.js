@@ -7,6 +7,23 @@ export default function setupLocalStrategy(passport) {
     new LocalStrategy(async function (username, password, done) {
       try {
         //Find the user and verify that the passwords match with hashing
+        const user = await prisma.user.findFirstOrThrow({
+          where: {
+            username, //longhand username: username
+          },
+        });
+
+        try {
+          const verifiedPassword = await argon2.verify(user.password, passport);
+
+          if(verifiedPassword) {
+            return done(null, { username, id: user.id });
+          } else {
+            return done("Wrong username or password", null);
+          }
+        } catch (e) {
+          return done(e, null);
+        }
       } catch (err) {
         return done(err, null);
       }

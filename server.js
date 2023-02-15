@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import setupLocalStrategy from "./auth/index.js";
 import authRouter from "./routes/auth.js";
+import createAuthRouter from "./routes/auth.js";
 
 export default function createServer() {
   const app = express();
@@ -11,12 +12,20 @@ export default function createServer() {
   app.use(express.json());
 
   //Add sessions here
+  app.use(session({
+    secret: "thisIsASecretSessionKey",
+    resave: false,
+    saveUninitialized: false
+  }))
 
   app.use(cookieParser());
 
   setupLocalStrategy(passport);
 
   //Add passport session middleware
+  app.use(passport.authenticate("session"));
+
+  const authRouter = createAuthRouter(passport);
 
   app.use("/auth", authRouter);
 
