@@ -14,7 +14,7 @@ export default function setupLocalStrategy(passport) {
         });
 
         try {
-          const verifiedPassword = await argon2.verify(user.password, passport);
+          const verifiedPassword = await argon2.verify(user.password, password);
 
           if(verifiedPassword) {
             return done(null, { username, id: user.id });
